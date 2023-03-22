@@ -3,6 +3,7 @@
 ### Tools 
  - Spring boot 3.0.0
  - gRPC
+ - AssertJ
 
 project still in construction, more resources will add
 
