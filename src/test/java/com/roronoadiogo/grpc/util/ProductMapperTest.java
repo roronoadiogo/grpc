@@ -25,11 +25,13 @@ public class ProductMapperTest {
     @DisplayName("Testing the conversion Product Mapper to Entity")
     public void product_ToEntityToDto_onSuccess(){
         var productInput = new ProductInputDto("Test Product", 20.00, 10);
-        var entity = MapperProduct.INSTANCE.toEntity(productInput);
+        Product mappedProduct = MapperProduct.INSTANCE.toEntity(productInput);
 
-        assertThat(productInput)
-                .usingRecursiveComparison()
-                .isEqualTo(entity);
+        assertThat(mappedProduct.getId()).isNull();
+        assertThat(mappedProduct.getName()).isEqualTo("Test Product");
+        assertThat(mappedProduct.getPrice()).isEqualTo(20.0);
+        assertThat(mappedProduct.getQuantityInStock()).isEqualTo(10);
+
     }
 
 }
