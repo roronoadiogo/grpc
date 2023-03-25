@@ -10,7 +10,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 @GrpcService
 public class ProductController extends ProductServiceGrpc.ProductServiceImplBase {
 
-    private IProductService productService;
+    private final IProductService productService;
 
     public ProductController(IProductService productService) {
         this.productService = productService;
@@ -18,22 +18,22 @@ public class ProductController extends ProductServiceGrpc.ProductServiceImplBase
 
     @Override
     public void create(ProductRequest request, StreamObserver<ProductResponse> responseObserver) {
-        super.create(request, responseObserver);
-
         var productInputDto = new ProductInputDto(request.getName(), request.getPrice(),
                 request.getQuantityInStock());
         try {
             var output = productService.create(productInputDto);
             var productResponse = ProductResponse.newBuilder()
-                    .setId(output.id()).setName(output.name())
-                    .setPrice(output.price()).build();
+                    .setId(output.id())
+                    .setName(output.name())
+                    .setPrice(output.price())
+                    .build();
+
             responseObserver.onNext(productResponse);
+            responseObserver.onCompleted();
+
         } catch (BusinessException e) {
             responseObserver.onError(e);
-        }finally{
-            responseObserver.onCompleted();
-        }
-
+     }
     }
 
     @Override
