@@ -6,11 +6,11 @@ import com.roronoadiogo.grpc.exceptions.BusinessException;
 import com.roronoadiogo.grpc.repository.ProductRepository;
 import com.roronoadiogo.grpc.service.IProductService;
 import com.roronoadiogo.grpc.util.MapperProduct;
-import jakarta.persistence.PersistenceException;
-import jakarta.validation.Validation;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.PersistenceException;
+import javax.validation.Validation;
 import java.util.List;
 
 @Service
@@ -33,10 +33,10 @@ public class ProductServiceImpl implements IProductService {
 
         var productEntity = MapperProduct.INSTANCE.toEntity(inputDto);
 
-        try{
+        try {
             var productCreated = this.productRepository.save(productEntity);
             return MapperProduct.INSTANCE.toDto(productCreated);
-        }catch (DataAccessException | PersistenceException e){
+        } catch (DataAccessException | PersistenceException e){
             throw new BusinessException("Error creating product: " + e.getMessage());
         }
     }

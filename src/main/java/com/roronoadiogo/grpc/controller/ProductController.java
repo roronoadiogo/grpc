@@ -6,23 +6,34 @@ import com.roronoadiogo.grpc.exceptions.BusinessException;
 import com.roronoadiogo.grpc.service.IProductService;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @GrpcService
 public class ProductController extends ProductServiceGrpc.ProductServiceImplBase {
 
-    @Autowired
     private IProductService productService;
 
+    public ProductController(IProductService productService) {
+        this.productService = productService;
+    }
+
     @Override
-    public void create(ProductRequest request, StreamObserver<ProductResponse> responseObserver) throws BusinessException {
+    public void create(ProductRequest request, StreamObserver<ProductResponse> responseObserver) {
         super.create(request, responseObserver);
 
         var productInputDto = new ProductInputDto(request.getName(), request.getPrice(),
                 request.getQuantityInStock());
+        try {
+            var output = productService.create(productInputDto);
+            var productResponse = ProductResponse.newBuilder()
+                    .setId(output.id()).setName(output.name())
+                    .setPrice(output.price()).build();
+            responseObserver.onNext(productResponse);
+        } catch (BusinessException e) {
+            responseObserver.onError(e);
+        }finally{
+            responseObserver.onCompleted();
+        }
 
-        productService.create(productInputDto);
     }
 
     @Override
