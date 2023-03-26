@@ -2,10 +2,13 @@ package com.roronoadiogo.grpc.service.impl;
 
 import com.roronoadiogo.grpc.dto.ProductInputDto;
 import com.roronoadiogo.grpc.dto.ProductOutputDto;
+import com.roronoadiogo.grpc.exceptions.BusinessBaseException;
 import com.roronoadiogo.grpc.exceptions.BusinessException;
+import com.roronoadiogo.grpc.exceptions.ProductNotFoundException;
 import com.roronoadiogo.grpc.repository.ProductRepository;
 import com.roronoadiogo.grpc.service.IProductService;
 import com.roronoadiogo.grpc.util.MapperProduct;
+import io.grpc.Status;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +26,12 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public ProductOutputDto create(ProductInputDto inputDto) throws BusinessException {
+    public ProductOutputDto create(ProductInputDto inputDto) throws BusinessBaseException {
         var validator = Validation.buildDefaultValidatorFactory().getValidator();
         var violations = validator.validate(inputDto);
 
         if (!violations.isEmpty()){
-            throw new BusinessException("Invalid input: " + violations);
+            throw new BusinessException(violations.toString(), Status.INVALID_ARGUMENT);
         }
 
         var productEntity = MapperProduct.INSTANCE.toEntity(inputDto);
@@ -37,7 +40,7 @@ public class ProductServiceImpl implements IProductService {
             var productCreated = this.productRepository.save(productEntity);
             return MapperProduct.INSTANCE.toDto(productCreated);
         } catch (DataAccessException | PersistenceException e){
-            throw new BusinessException("Error creating product: " + e.getMessage());
+            throw new BusinessException(e.getMessage(), Status.INTERNAL);
         }
     }
 
@@ -47,9 +50,9 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public void delete(Long id) throws BusinessException {
+    public void delete(Long id) throws BusinessBaseException {
         var product = this.productRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Product not found"));
+                .orElseThrow(() -> new ProductNotFoundException(id));
         this.productRepository.delete(product);
     }
 
