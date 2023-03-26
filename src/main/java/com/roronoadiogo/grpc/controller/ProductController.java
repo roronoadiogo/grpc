@@ -27,13 +27,12 @@ public class ProductController extends ProductServiceGrpc.ProductServiceImplBase
                     .setName(output.name())
                     .setPrice(output.price())
                     .build();
-
             responseObserver.onNext(productResponse);
-            responseObserver.onCompleted();
-
         } catch (BusinessException e) {
-            responseObserver.onError(e);
-     }
+            responseObserver.onError(e.getCause());
+        }finally{
+            responseObserver.onCompleted();
+        }
     }
 
     @Override
