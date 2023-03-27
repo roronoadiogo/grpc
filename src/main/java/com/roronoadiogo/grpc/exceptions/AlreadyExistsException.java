@@ -2,12 +2,12 @@ package com.roronoadiogo.grpc.exceptions;
 
 import io.grpc.Status;
 
-public class AlreadyExistsExample extends BusinessBaseException {
+public class AlreadyExistsException extends BusinessBaseException {
 
     private static String ERROR_MESSAGE_FORMAT = "Product %s already exists in the system.";
     private final String name;
 
-    public AlreadyExistsExample(String name) {
+    public AlreadyExistsException(String name) {
         super(String.format(ERROR_MESSAGE_FORMAT, name));
         this.name = name;
     }
