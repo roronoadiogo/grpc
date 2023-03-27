@@ -2,7 +2,6 @@ package com.roronoadiogo.grpc.controller;
 
 import com.roronoadiogo.grpc.*;
 import com.roronoadiogo.grpc.dto.ProductInputDto;
-import com.roronoadiogo.grpc.exceptions.BusinessException;
 import com.roronoadiogo.grpc.service.IProductService;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -20,7 +19,7 @@ public class ProductController extends ProductServiceGrpc.ProductServiceImplBase
     public void create(ProductRequest request, StreamObserver<ProductResponse> responseObserver) {
         var productInputDto = new ProductInputDto(request.getName(), request.getPrice(),
                 request.getQuantityInStock());
-        try {
+
             var output = productService.create(productInputDto);
             var productResponse = ProductResponse.newBuilder()
                     .setId(output.id())
@@ -28,11 +27,8 @@ public class ProductController extends ProductServiceGrpc.ProductServiceImplBase
                     .setPrice(output.price())
                     .build();
             responseObserver.onNext(productResponse);
-        } catch (BusinessException e) {
-            responseObserver.onError(e.getCause());
-        }finally{
             responseObserver.onCompleted();
-        }
+
     }
 
     @Override
